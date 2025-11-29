@@ -1,41 +1,51 @@
-# Website
+# docs.headvroom.com
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+Documentation site for Headvroom - Interactive knowledge graph visualization.
 
-## Installation
+## Quick Reference
 
-```bash
-yarn
-```
+| Resource | URL |
+|----------|-----|
+| Live Site | https://docs.headvroom.com |
+| Fallback | https://chrisberno.github.io/docs.headvroom.com/ |
+| Repository | https://github.com/chrisberno/docs.headvroom.com |
 
 ## Local Development
 
 ```bash
-yarn start
+npm install
+npm run start
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+Opens at http://localhost:3000
 
 ## Build
 
 ```bash
-yarn build
+npm run build
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+Build must succeed before pushing.
 
 ## Deployment
 
-Using SSH:
+**Automatic**: Push to `main` triggers GitHub Actions deployment.
 
 ```bash
-USE_SSH=true yarn deploy
+git add .
+git commit -m "Your commit message"
+git push origin main
 ```
 
-Not using SSH:
+See [Deployment Guide](docs/deployment-guide.md) for full protocol.
 
-```bash
-GIT_USER=<Your GitHub username> yarn deploy
-```
+## Tech Stack
 
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+- Docusaurus 3.x
+- TypeScript
+- GitHub Pages
+- GitHub Actions CI/CD
+
+## Documentation Pattern
+
+All feature docs use three-path tabs: Users | Developers | Agents

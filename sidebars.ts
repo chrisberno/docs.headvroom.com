@@ -48,6 +48,11 @@ const sidebars: SidebarsConfig = {
       id: 'agents/index',
       label: 'Agents Guide',
     },
+    {
+      type: 'doc',
+      id: 'deployment-guide',
+      label: 'Deployment Guide',
+    },
   ],
 };
 
