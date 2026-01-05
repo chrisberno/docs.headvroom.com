@@ -4,10 +4,6 @@
       "source": "/(.*)",
       "headers": [
         {
-          "key": "X-Frame-Options",
-          "value": "ALLOW-FROM https://headvroom.com"
-        },
-        {
           "key": "Content-Security-Policy",
           "value": "frame-ancestors 'self' https://headvroom.com https://*.headvroom.com"
         }
