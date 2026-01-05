@@ -1,0 +1,402 @@
+---
+sidebar_position: 4
+title: Troubleshooting
+description: Common issues and solutions for MCP integration
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# MCP Troubleshooting
+
+Solutions for common issues when connecting AI tools to Headvroom.
+
+<Tabs>
+<TabItem value="users" label="Users" default>
+
+## Common Issues
+
+### "Connection refused" or AI doesn't recognize Headvroom
+
+**Symptoms:**
+
+- AI says it doesn't know about Headvroom
+- Error messages about connection failing
+- MCP server not starting
+
+**Solutions:**
+
+1. **Restart your AI tool completely**
+   - On Mac: Cmd+Q to fully quit (not just close the window)
+   - On Windows: Right-click tray icon → Quit
+   - Then reopen the application
+
+2. **Check your API key is correct**
+   - Go to [headvroom.com](https://headvroom.com) → Settings → API Keys
+   - Verify the key exists and hasn't been deleted
+   - If unsure, generate a new key and update your config
+
+3. **Verify the config file was saved**
+   - Make sure you saved after editing
+   - Check for typos in the JSON (missing commas, quotes)
+
+---
+
+### "Unauthorized" or "Invalid API key"
+
+**Symptoms:**
+
+- AI says it can't authenticate
+- Error about invalid or expired key
+
+**Solutions:**
+
+1. **Generate a new API key**
+   - Your key may have been deleted or is incorrect
+   - Go to Headvroom Settings → API Keys → Generate New Key
+   - Update your AI tool's config with the new key
+
+2. **Check for copy/paste errors**
+   - Make sure you copied the entire key (starts with `hv_`)
+   - No extra spaces before or after the key
+
+---
+
+### "No graphs found"
+
+**Symptoms:**
+
+- AI connects but says you have no graphs
+- Empty results when listing graphs
+
+**Solutions:**
+
+1. **Create a graph in Headvroom**
+   - You need at least one graph for the MCP server to return data
+   - Go to [headvroom.com](https://headvroom.com) and create a graph
+
+2. **Check you're signed into the right account**
+   - The API key is linked to a specific Headvroom account
+   - Make sure you generated the key from the account with your graphs
+
+---
+
+### AI gives incomplete or cut-off responses
+
+**Symptoms:**
+
+- Node content seems truncated
+- Missing nodes from large graphs
+
+**This is expected behavior:**
+
+- Large graphs are limited to 50 nodes per query
+- Notes are truncated to 500 characters in list views
+- Ask for specific nodes or graphs to get full content
+
+**Workaround:**
+
+- Ask: *"Get the full details for the [Node Name] node"*
+- Ask: *"Load just the [specific section] from my graph"*
+
+---
+
+### Can't find config file location
+
+**Config file locations:**
+
+| Tool | Location |
+|------|----------|
+| Claude Desktop (Mac) | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Claude Desktop (Windows) | `%APPDATA%\Claude\claude_desktop_config.json` |
+| Cursor | `~/.cursor/mcp.json` |
+| Windsurf | `~/.codeium/windsurf/mcp_config.json` |
+
+**Tip:** If the file doesn't exist, create it with the configuration from the [Setup Guide](/integrations/mcp/setup).
+
+</TabItem>
+<TabItem value="developers" label="Developers">
+
+## Diagnostic Commands
+
+### Test MCP Server Directly
+
+```bash
+# Start server and check for errors
+HEADVROOM_API_KEY=hv_xxx npx -y @headvroom/mcp
+
+# Should start without output (waiting for stdio input)
+# Press Ctrl+C to exit
+```
+
+### Test API Connectivity
+
+```bash
+# Health check
+curl -s -H "Authorization: Bearer hv_xxx" \
+  https://headvroom.com/api/mcp/health | jq
+
+# List graphs
+curl -s -H "Authorization: Bearer hv_xxx" \
+  https://headvroom.com/api/mcp/graphs | jq
+```
+
+### Validate Config JSON
+
+```bash
+# macOS - Claude Desktop
+cat ~/Library/Application\ Support/Claude/claude_desktop_config.json | jq .
+
+# If jq shows an error, your JSON is malformed
+```
+
+### Check Claude CLI Configuration
+
+```bash
+# List configured MCP servers
+claude mcp list
+
+# Should show: headvroom (stdio)
+```
+
+### View Logs
+
+```bash
+# Claude Desktop logs (macOS)
+tail -f ~/Library/Logs/Claude/mcp*.log
+
+# Claude Desktop logs (Windows PowerShell)
+Get-Content "$env:APPDATA\Claude\logs\mcp*.log" -Wait
+```
+
+---
+
+## Common Error Codes
+
+| Error | Code | Cause | Fix |
+|-------|------|-------|-----|
+| Unauthorized | -32600 | Invalid/expired API key | Regenerate key |
+| Not Found | -32601 | Unknown resource URI | Check URI format |
+| Invalid Params | -32602 | Missing/malformed parameters | Check request |
+| Internal Error | -32603 | Server-side issue | Retry, check Headvroom status |
+
+---
+
+## JSON Configuration Issues
+
+### Missing Commas
+
+```json
+// Wrong - missing comma
+{
+  "mcpServers": {
+    "other": { },
+    "headvroom": { }
+  }
+}
+
+// Correct
+{
+  "mcpServers": {
+    "other": { },
+    "headvroom": { }
+  }
+}
+```
+
+### Incorrect Nesting
+
+```json
+// Wrong - headvroom outside mcpServers
+{
+  "mcpServers": { },
+  "headvroom": { }
+}
+
+// Correct - headvroom inside mcpServers
+{
+  "mcpServers": {
+    "headvroom": { }
+  }
+}
+```
+
+### Environment Variable in Quotes
+
+```json
+// Wrong - will pass literal string "$HEADVROOM_API_KEY"
+{
+  "env": {
+    "HEADVROOM_API_KEY": "$HEADVROOM_API_KEY"
+  }
+}
+
+// Correct - pass actual key value
+{
+  "env": {
+    "HEADVROOM_API_KEY": "hv_actual_key_here"
+  }
+}
+```
+
+---
+
+## Network Issues
+
+### Corporate Proxy
+
+If behind a corporate proxy:
+
+```bash
+# Set proxy for npx
+export HTTP_PROXY=http://proxy.company.com:8080
+export HTTPS_PROXY=http://proxy.company.com:8080
+```
+
+### Firewall Blocking
+
+Ensure outbound access to:
+
+- `registry.npmjs.org` (port 443) - for npx
+- `headvroom.com` (port 443) - for API
+
+</TabItem>
+<TabItem value="agents" label="Agents">
+
+## Quick Diagnostic
+
+```bash
+# 1. Test npx works
+npx -y @headvroom/mcp --version 2>&1 || echo "npx issue"
+
+# 2. Test API key
+curl -sf -H "Authorization: Bearer $HEADVROOM_API_KEY" \
+  https://headvroom.com/api/mcp/health && echo "API OK" || echo "API FAIL"
+
+# 3. Test config syntax (macOS Claude Desktop)
+jq . ~/Library/Application\ Support/Claude/claude_desktop_config.json \
+  && echo "JSON OK" || echo "JSON FAIL"
+```
+
+## Issue Matrix
+
+| Symptom | Check | Fix |
+|---------|-------|-----|
+| "Unknown MCP" | Config file exists? | Create config file |
+| "Connection refused" | npx works? | Check Node.js/npm |
+| "Unauthorized" | Key valid? | Regenerate key |
+| "No graphs" | Account has graphs? | Create graph in Headvroom |
+| Truncated data | Expected behavior | Query specific nodes |
+| Slow responses | GitHub cache? | Wait 5 min for fresh data |
+
+## Config Templates
+
+### Claude Desktop (macOS)
+
+```bash
+cat > ~/Library/Application\ Support/Claude/claude_desktop_config.json << 'EOF'
+{
+  "mcpServers": {
+    "headvroom": {
+      "command": "npx",
+      "args": ["-y", "@headvroom/mcp"],
+      "env": {
+        "HEADVROOM_API_KEY": "REPLACE_WITH_KEY"
+      }
+    }
+  }
+}
+EOF
+```
+
+### Claude CLI
+
+```bash
+claude mcp add --transport stdio --scope user headvroom \
+  --env HEADVROOM_API_KEY=REPLACE_WITH_KEY \
+  -- npx -y @headvroom/mcp
+```
+
+### Cursor
+
+```bash
+mkdir -p ~/.cursor
+cat > ~/.cursor/mcp.json << 'EOF'
+{
+  "mcpServers": {
+    "headvroom": {
+      "command": "npx",
+      "args": ["-y", "@headvroom/mcp"],
+      "env": {
+        "HEADVROOM_API_KEY": "REPLACE_WITH_KEY"
+      }
+    }
+  }
+}
+EOF
+```
+
+## Escalation Path
+
+1. **User-fixable:** Config errors, key issues, restart needed
+2. **Headvroom issue:** API returning errors → Check status.headvroom.com
+3. **MCP package issue:** npm/npx errors → Check @headvroom/mcp on npm
+
+</TabItem>
+</Tabs>
+
+---
+
+## Still Having Issues?
+
+<Tabs>
+<TabItem value="users" label="Users" default>
+
+If you've tried the solutions above and still have problems:
+
+1. **Check Headvroom Status** - Visit the app to make sure it's working
+2. **Try a Fresh Key** - Delete old keys, generate new one, update config
+3. **Contact Support** - Email support@headvroom.com with:
+   - Your AI tool name and version
+   - The error message you're seeing
+   - Steps you've already tried
+
+</TabItem>
+<TabItem value="developers" label="Developers">
+
+### Debug Checklist
+
+- [ ] npx executes without error
+- [ ] API key returns 200 on health check
+- [ ] Config JSON parses without error
+- [ ] AI tool fully restarted after config change
+- [ ] No proxy/firewall blocking connections
+
+### Report an Issue
+
+Open an issue at [github.com/chrisberno/headvroom](https://github.com/chrisberno/headvroom/issues) with:
+
+- Error output from diagnostic commands
+- Config file (redact API key)
+- Tool name and version
+- OS and version
+
+</TabItem>
+<TabItem value="agents" label="Agents">
+
+### Escalation
+
+1. Run full diagnostic (above)
+2. If API works but MCP doesn't → config issue
+3. If API fails → Headvroom issue or key issue
+4. If npx fails → Node.js/npm environment issue
+
+### Support Contact
+
+- GitHub Issues: `github.com/chrisberno/headvroom/issues`
+- Email: `support@headvroom.com`
+
+Include diagnostic output and redacted config.
+
+</TabItem>
+</Tabs>

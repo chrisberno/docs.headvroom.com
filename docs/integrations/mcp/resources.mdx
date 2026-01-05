@@ -1,0 +1,470 @@
+---
+sidebar_position: 3
+title: Resources Reference
+description: Complete reference for all MCP resources and their schemas
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# MCP Resources Reference
+
+Complete reference for all resources available through the Headvroom MCP server.
+
+<Tabs>
+<TabItem value="users" label="Users" default>
+
+## What Your AI Can Access
+
+When connected to Headvroom, your AI assistant can access these types of information:
+
+### Your Graphs
+
+| What | Example Prompt |
+|------|----------------|
+| List all graphs | *"What graphs do I have?"* |
+| Get graph details | *"Load my Product Roadmap graph"* |
+| Get quick summary | *"Give me a quick overview of my Research graph"* |
+| Find by name | *"Find my graph called 'Q1 Planning'"* |
+
+### Your Nodes
+
+| What | Example Prompt |
+|------|----------------|
+| Node details | *"What's in the Authentication node?"* |
+| Search nodes | *"Search for nodes about user login"* |
+
+### Your Activity
+
+| What | Example Prompt |
+|------|----------------|
+| Recent work | *"What have I worked on this week?"* |
+| Graph activity | *"Show recent changes to my API Design graph"* |
+
+### Connected Services
+
+| What | Example Prompt |
+|------|----------------|
+| GitHub data | *"Show the GitHub commits for my project node"* |
+| All integrations | *"What GitHub repos are connected to my graphs?"* |
+
+### Limitations
+
+- **50 nodes max** per graph query (large graphs are summarized)
+- **Notes truncated** to 500 characters in list views
+- **GitHub data** cached for 5 minutes
+- **Read-only** — your AI can't create or modify anything
+
+</TabItem>
+<TabItem value="developers" label="Developers">
+
+## Resource URI Reference
+
+All resources use the `headvroom://` URI scheme.
+
+### Health Check
+
+```
+headvroom://health
+```
+
+Verifies API connectivity and authentication.
+
+**Response:**
+
+```json
+{
+  "status": "ok",
+  "user": "user@example.com",
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+```
+
+---
+
+### Graphs
+
+#### List All Graphs
+
+```
+headvroom://graphs
+```
+
+Returns all graphs owned by the authenticated user.
+
+**Response:**
+
+```json
+{
+  "graphs": [
+    {
+      "id": "uuid-here",
+      "name": "Product Roadmap",
+      "description": "Q1 2024 planning",
+      "nodeCount": 45,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "count": 1
+}
+```
+
+#### Get Graph by ID
+
+```
+headvroom://graph/{id}
+```
+
+Returns full graph data including nodes, edges, and notes.
+
+**Parameters:**
+
+- `id` (required): Graph UUID
+
+**Response:**
+
+```json
+{
+  "graph": {
+    "id": "uuid",
+    "name": "Product Roadmap",
+    "description": "...",
+    "nodes": [
+      {
+        "id": "node-uuid",
+        "label": "Authentication",
+        "type": "feature",
+        "notes": "Implement OAuth2...",
+        "metadata": {}
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-uuid",
+        "source": "node-uuid-1",
+        "target": "node-uuid-2",
+        "label": "requires"
+      }
+    ]
+  }
+}
+```
+
+**Constraints:**
+
+- Maximum 50 nodes returned
+- Notes truncated to 500 characters
+
+#### Get Graph Summary
+
+```
+headvroom://graph/{id}/summary
+```
+
+Lightweight overview without full node content.
+
+**Response:**
+
+```json
+{
+  "graph": {
+    "id": "uuid",
+    "name": "Product Roadmap",
+    "description": "...",
+    "nodeCount": 45,
+    "edgeCount": 62,
+    "topNodes": ["Authentication", "API Design", "Database"],
+    "recentActivity": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+#### Get Graph by Name
+
+```
+headvroom://graph/name/{name}
+```
+
+Lookup graph by display name (case-insensitive).
+
+**Parameters:**
+
+- `name` (required): Graph display name (URL-encoded)
+
+---
+
+### Nodes
+
+#### Get Node Details
+
+```
+headvroom://node/{id}
+```
+
+Returns single node with full content.
+
+**Response:**
+
+```json
+{
+  "node": {
+    "id": "node-uuid",
+    "graphId": "graph-uuid",
+    "label": "Authentication",
+    "type": "feature",
+    "notes": "Full notes content here...",
+    "links": ["https://docs.example.com"],
+    "metadata": {
+      "status": "in-progress",
+      "priority": "high"
+    },
+    "connections": {
+      "incoming": ["node-uuid-1"],
+      "outgoing": ["node-uuid-2", "node-uuid-3"]
+    }
+  }
+}
+```
+
+#### Search Nodes
+
+```
+headvroom://nodes/search?query={q}
+```
+
+Full-text search across all graphs.
+
+**Parameters:**
+
+- `query` (required): Search term
+
+**Response:**
+
+```json
+{
+  "results": [
+    {
+      "nodeId": "node-uuid",
+      "graphId": "graph-uuid",
+      "graphName": "Product Roadmap",
+      "label": "OAuth Authentication",
+      "snippet": "...implementing OAuth2 flow for...",
+      "score": 0.95
+    }
+  ],
+  "count": 1,
+  "query": "oauth"
+}
+```
+
+---
+
+### Activity
+
+#### Recent Activity (Cross-Graph)
+
+```
+headvroom://activity/recent?days={n}
+```
+
+Activity feed across all graphs.
+
+**Parameters:**
+
+- `days` (optional): Number of days to look back (default: 7, max: 30)
+
+**Response:**
+
+```json
+{
+  "activity": [
+    {
+      "type": "node_created",
+      "graphId": "graph-uuid",
+      "graphName": "Product Roadmap",
+      "nodeId": "node-uuid",
+      "nodeLabel": "New Feature",
+      "timestamp": "2024-01-15T10:30:00Z"
+    },
+    {
+      "type": "node_updated",
+      "graphId": "graph-uuid",
+      "graphName": "Product Roadmap",
+      "nodeId": "node-uuid",
+      "nodeLabel": "Authentication",
+      "changes": ["notes", "metadata"],
+      "timestamp": "2024-01-15T09:00:00Z"
+    }
+  ],
+  "period": {
+    "start": "2024-01-08T00:00:00Z",
+    "end": "2024-01-15T23:59:59Z"
+  }
+}
+```
+
+#### Graph Activity
+
+```
+headvroom://graph/{id}/activity
+```
+
+Activity for a specific graph.
+
+---
+
+### GitHub Integration
+
+#### Node GitHub Data
+
+```
+headvroom://node/{id}/github
+```
+
+GitHub repository data linked to a node.
+
+**Response:**
+
+```json
+{
+  "github": {
+    "repository": "owner/repo-name",
+    "url": "https://github.com/owner/repo-name",
+    "defaultBranch": "main",
+    "recentCommits": [
+      {
+        "sha": "abc123",
+        "message": "Fix authentication bug",
+        "author": "developer",
+        "date": "2024-01-15T10:30:00Z"
+      }
+    ],
+    "openIssues": 5,
+    "lastFetched": "2024-01-15T10:35:00Z"
+  }
+}
+```
+
+**Note:** GitHub data is cached for 5 minutes.
+
+#### All GitHub Connections
+
+```
+headvroom://integrations/github
+```
+
+All GitHub repositories connected to any node.
+
+**Response:**
+
+```json
+{
+  "connections": [
+    {
+      "nodeId": "node-uuid",
+      "nodeLabel": "Backend API",
+      "graphName": "Product Roadmap",
+      "repository": "owner/backend-api",
+      "url": "https://github.com/owner/backend-api"
+    }
+  ],
+  "count": 1
+}
+```
+
+</TabItem>
+<TabItem value="agents" label="Agents">
+
+## Quick Reference
+
+### URI Patterns
+
+```
+headvroom://health                           # Connection test
+headvroom://graphs                           # All graphs
+headvroom://graph/{id}                       # Full graph
+headvroom://graph/{id}/summary               # Graph overview
+headvroom://graph/name/{name}                # Find by name
+headvroom://node/{id}                        # Node details
+headvroom://nodes/search?query={q}           # Search
+headvroom://activity/recent?days={n}         # Recent activity
+headvroom://graph/{id}/activity              # Graph activity
+headvroom://node/{id}/github                 # Node GitHub data
+headvroom://integrations/github              # All GitHub links
+```
+
+### Constraints
+
+| Resource | Limit |
+|----------|-------|
+| Nodes per graph | 50 |
+| Note preview | 500 chars |
+| Activity days | 30 max |
+| GitHub cache | 5 min |
+
+### Response Shapes (TypeScript)
+
+```typescript
+interface Graph {
+  id: string;
+  name: string;
+  description?: string;
+  nodes: Node[];
+  edges: Edge[];
+}
+
+interface Node {
+  id: string;
+  graphId: string;
+  label: string;
+  type?: string;
+  notes?: string;
+  metadata?: Record<string, unknown>;
+}
+
+interface Edge {
+  id: string;
+  source: string;
+  target: string;
+  label?: string;
+}
+
+interface SearchResult {
+  nodeId: string;
+  graphId: string;
+  graphName: string;
+  label: string;
+  snippet: string;
+  score: number;
+}
+
+interface ActivityItem {
+  type: 'node_created' | 'node_updated' | 'node_deleted' | 'edge_created';
+  graphId: string;
+  graphName: string;
+  nodeId?: string;
+  nodeLabel?: string;
+  timestamp: string;
+}
+```
+
+### Error Responses
+
+```typescript
+interface MCPError {
+  error: {
+    code: number;
+    message: string;
+  }
+}
+
+// Common codes:
+// -32600: Invalid request / unauthorized
+// -32601: Unknown resource
+// -32602: Invalid parameters
+// -32603: Internal error
+```
+
+</TabItem>
+</Tabs>

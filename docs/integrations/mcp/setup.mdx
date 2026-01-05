@@ -1,0 +1,371 @@
+---
+sidebar_position: 2
+title: Setup Guide
+description: Step-by-step setup for Claude, Cursor, Windsurf, and other AI tools
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# MCP Setup Guide
+
+Get your AI tools connected to Headvroom in minutes.
+
+## Step 1: Generate an API Key
+
+<Tabs>
+<TabItem value="users" label="Users" default>
+
+### Getting Your API Key
+
+1. Go to [headvroom.com](https://headvroom.com) and sign in
+2. Click your **avatar** in the top-right corner (or click your **account node** in Matrix view)
+3. In the Settings panel, find the **API Keys** section
+4. Click **+ Generate New Key**
+5. Give your key a name (e.g., "Claude Desktop" or "Cursor")
+6. **Copy the key immediately** — it won't be shown again!
+
+:::warning Keep Your Key Secret
+Your API key grants full read access to all your graphs. If you think it's been compromised, delete it from Settings and create a new one.
+:::
+
+### Tips for Managing Keys
+
+- **Create one key per tool** — If you stop using a tool, you can revoke just that key
+- **Use descriptive names** — "Claude Desktop MacBook" is better than "Key 1"
+- **Check last used** — Settings shows when each key was last used
+
+</TabItem>
+<TabItem value="developers" label="Developers">
+
+### API Key Generation
+
+**Endpoint:** Settings panel in Headvroom web app (no direct API for key generation)
+
+**Key format:** `hv_` prefix followed by 32 alphanumeric characters
+
+**Key properties:**
+
+- Bound to creating user's account
+- Full read access to user's graphs (no scope limiting yet)
+- No expiration (manual revocation only)
+- Usage tracking (last-used timestamp)
+
+**Storage recommendations:**
+
+- Environment variables (recommended)
+- Secrets manager (AWS Secrets Manager, HashiCorp Vault)
+- Never in source code or config files committed to git
+
+```bash
+# Good: Environment variable
+export HEADVROOM_API_KEY="hv_xxxxxxxxxxxx"
+
+# Bad: Hardcoded in config (don't do this)
+"env": { "HEADVROOM_API_KEY": "hv_xxxxxxxxxxxx" }  # In committed file
+```
+
+### Verifying a Key
+
+Test your key with a direct API call:
+
+```bash
+curl -H "Authorization: Bearer hv_your_key_here" \
+  https://headvroom.com/api/mcp/health
+```
+
+Expected response:
+
+```json
+{ "status": "ok", "user": "user@example.com" }
+```
+
+</TabItem>
+<TabItem value="agents" label="Agents">
+
+### Quick Key Setup
+
+```
+1. headvroom.com → sign in
+2. Avatar (top-right) → Settings
+3. API Keys → + Generate New Key
+4. Name it, copy it, store securely
+```
+
+**Key format:** `hv_` + 32 chars
+
+**Verify:**
+
+```bash
+curl -H "Authorization: Bearer $HEADVROOM_API_KEY" \
+  https://headvroom.com/api/mcp/health
+# → {"status":"ok"}
+```
+
+</TabItem>
+</Tabs>
+
+---
+
+## Step 2: Configure Your AI Tool
+
+<Tabs groupId="ai-tool">
+<TabItem value="claude-desktop" label="Claude Desktop" default>
+
+### Claude Desktop Setup
+
+**Config file location:**
+
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+
+**Add this configuration:**
+
+```json
+{
+  "mcpServers": {
+    "headvroom": {
+      "command": "npx",
+      "args": ["-y", "@headvroom/mcp"],
+      "env": {
+        "HEADVROOM_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+:::tip Multiple MCP Servers
+If you already have other MCP servers configured, add `headvroom` as another entry inside `mcpServers`:
+
+```json
+{
+  "mcpServers": {
+    "existing-server": { ... },
+    "headvroom": {
+      "command": "npx",
+      "args": ["-y", "@headvroom/mcp"],
+      "env": {
+        "HEADVROOM_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+:::
+
+**After saving:**
+
+1. Fully quit Claude Desktop (Cmd+Q on Mac, not just close window)
+2. Reopen Claude Desktop
+3. Try: *"What graphs do I have in Headvroom?"*
+
+</TabItem>
+<TabItem value="claude-cli" label="Claude CLI">
+
+### Claude CLI Setup
+
+Add the MCP server with a single command:
+
+```bash
+claude mcp add --transport stdio --scope user headvroom \
+  --env HEADVROOM_API_KEY=your-api-key-here \
+  -- npx -y @headvroom/mcp
+```
+
+**Verify it's configured:**
+
+```bash
+claude mcp list
+```
+
+You should see `headvroom` in the list.
+
+**Test it:**
+
+```bash
+claude "What graphs do I have in Headvroom?"
+```
+
+### Removing the Integration
+
+```bash
+claude mcp remove headvroom
+```
+
+</TabItem>
+<TabItem value="cursor" label="Cursor">
+
+### Cursor Setup
+
+**Config file:** `~/.cursor/mcp.json`
+
+Create or edit this file:
+
+```json
+{
+  "mcpServers": {
+    "headvroom": {
+      "command": "npx",
+      "args": ["-y", "@headvroom/mcp"],
+      "env": {
+        "HEADVROOM_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+**After saving:**
+
+1. Restart Cursor completely
+2. Open a new chat
+3. Try: *"Load my Headvroom project context"*
+
+</TabItem>
+<TabItem value="windsurf" label="Windsurf">
+
+### Windsurf Setup
+
+**Config file:** `~/.codeium/windsurf/mcp_config.json`
+
+```json
+{
+  "mcpServers": {
+    "headvroom": {
+      "command": "npx",
+      "args": ["-y", "@headvroom/mcp"],
+      "env": {
+        "HEADVROOM_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+**After saving:**
+
+1. Restart Windsurf
+2. Start a new Cascade session
+3. Try: *"What Headvroom graphs do I have?"*
+
+</TabItem>
+<TabItem value="other" label="Other Tools">
+
+### Generic MCP Configuration
+
+For any MCP-compatible tool, use these settings:
+
+| Setting | Value |
+|---------|-------|
+| **Command** | `npx` |
+| **Arguments** | `["-y", "@headvroom/mcp"]` |
+| **Environment** | `HEADVROOM_API_KEY=your-api-key-here` |
+| **Transport** | stdio |
+
+### Manual Testing
+
+Run the MCP server directly to verify it works:
+
+```bash
+HEADVROOM_API_KEY=your-key-here npx -y @headvroom/mcp
+```
+
+The server will start and wait for input. Press Ctrl+C to exit.
+
+</TabItem>
+</Tabs>
+
+---
+
+## Step 3: Verify Connection
+
+<Tabs>
+<TabItem value="users" label="Users" default>
+
+### Testing Your Connection
+
+After restarting your AI tool, try these prompts:
+
+1. **Basic test:** *"What graphs do I have in Headvroom?"*
+   - You should see a list of your graph names
+
+2. **Load context:** *"Load my [Graph Name] from Headvroom and summarize it"*
+   - Replace `[Graph Name]` with one of your actual graphs
+
+3. **Search:** *"Search my Headvroom graphs for [topic]"*
+   - Replace `[topic]` with something in your graphs
+
+If these work, you're all set!
+
+### Not Working?
+
+See the [Troubleshooting Guide](/integrations/mcp/troubleshooting) for common issues and solutions.
+
+</TabItem>
+<TabItem value="developers" label="Developers">
+
+### Verification Steps
+
+**1. Check MCP server starts:**
+
+```bash
+HEADVROOM_API_KEY=hv_xxx npx -y @headvroom/mcp 2>&1 | head -5
+```
+
+Should show server initialization without errors.
+
+**2. Test API connectivity:**
+
+```bash
+curl -s -H "Authorization: Bearer hv_xxx" \
+  https://headvroom.com/api/mcp/health | jq
+```
+
+**3. Verify in Claude CLI:**
+
+```bash
+claude mcp list
+# Should show: headvroom (stdio)
+```
+
+**4. Test resource access:**
+
+```bash
+claude "Using the headvroom MCP, list all available graphs"
+```
+
+### Debug Logging
+
+For Claude Desktop, check logs at:
+
+- **macOS:** `~/Library/Logs/Claude/mcp*.log`
+- **Windows:** `%APPDATA%\Claude\logs\mcp*.log`
+
+</TabItem>
+<TabItem value="agents" label="Agents">
+
+### Quick Verification
+
+```bash
+# 1. Test MCP server
+HEADVROOM_API_KEY=hv_xxx npx -y @headvroom/mcp &
+# Should start without error
+
+# 2. Test API
+curl -H "Authorization: Bearer hv_xxx" \
+  https://headvroom.com/api/mcp/graphs
+
+# 3. Test in AI tool
+# Prompt: "What graphs do I have in Headvroom?"
+# Expected: List of graph names
+```
+
+**Success criteria:**
+
+- MCP server starts without error
+- API returns user's graphs
+- AI tool can list graphs by name
+
+</TabItem>
+</Tabs>

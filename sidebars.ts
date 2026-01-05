@@ -20,17 +20,38 @@ const sidebars: SidebarsConfig = {
         'features/nodes-connections',
         'features/notes',
         'features/links',
-        {
-          type: 'category',
-          label: 'Integrations',
-          items: [
-            'features/integrations/google-drive',
-            'features/integrations/media-images',
-          ],
-        },
         'features/media',
         'features/themes-layouts',
         'features/embedding-sharing',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Integrations',
+      collapsed: false,
+      link: {
+        type: 'doc',
+        id: 'integrations/index',
+      },
+      items: [
+        {
+          type: 'category',
+          label: 'MCP Server',
+          link: {
+            type: 'doc',
+            id: 'integrations/mcp/index',
+          },
+          items: [
+            'integrations/mcp/setup',
+            'integrations/mcp/resources',
+            'integrations/mcp/troubleshooting',
+          ],
+        },
+        {
+          type: 'doc',
+          id: 'integrations/google-drive/index',
+          label: 'Google Drive',
+        },
       ],
     },
     {

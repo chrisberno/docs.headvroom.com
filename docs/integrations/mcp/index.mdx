@@ -1,0 +1,334 @@
+---
+sidebar_position: 1
+title: MCP Server
+description: Connect AI assistants to your Headvroom knowledge graphs
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Headvroom MCP Server
+
+Connect your AI tools to your Headvroom knowledge graphs using the Model Context Protocol (MCP).
+
+<Tabs>
+<TabItem value="users" label="Users" default>
+
+## What is MCP?
+
+**Model Context Protocol (MCP)** lets AI applications like Claude access your data directly. With Headvroom's MCP server, your AI assistant can see your knowledge graphs without you having to copy and paste information.
+
+### What Your AI Can Do
+
+Once connected, your AI assistant can:
+
+- **List your graphs** - See all your knowledge graphs at a glance
+- **Read graph content** - Access nodes, connections, and notes
+- **Check recent activity** - Know what you've been working on
+- **Search your knowledge** - Find information across all your graphs
+- **View linked GitHub data** - See repository info connected to your projects
+
+### Why Use This?
+
+**Before MCP:**
+> "Here's my project structure... [pastes 500 lines of context]. Now, where were we?"
+
+**After MCP:**
+> "Load my Headvroom project and tell me where we left off."
+
+Your AI remembers your context because it can read it directly from Headvroom.
+
+### Quick Setup
+
+1. **Generate an API key** in Headvroom Settings
+2. **Add the configuration** to your AI tool (Claude, Cursor, etc.)
+3. **Start chatting** with full context access
+
+See the [Setup Guide](/integrations/mcp/setup) for step-by-step instructions with screenshots.
+
+### Example Prompts to Try
+
+Once connected, try asking your AI:
+
+- *"What graphs do I have in Headvroom?"*
+- *"Load context from my Product Roadmap graph and summarize it."*
+- *"What have I been working on this week?"*
+- *"Search my graphs for anything about authentication."*
+
+### What It Can't Do (Yet)
+
+Currently, the MCP server is **read-only**. Your AI can view your data but cannot create or modify nodes. Write access is coming soon.
+
+</TabItem>
+<TabItem value="developers" label="Developers">
+
+## Architecture Overview
+
+The Headvroom MCP server implements the [Model Context Protocol](https://modelcontextprotocol.io/) specification, providing AI applications with structured access to knowledge graph data.
+
+```
+┌──────────────────┐      ┌──────────────────┐      ┌──────────────────┐
+│   Claude/Cursor  │ ───► │  Headvroom MCP   │ ───► │   Headvroom API  │
+│   (AI Client)    │      │     Server       │      │    (Supabase)    │
+└──────────────────┘      └──────────────────┘      └──────────────────┘
+         │                        │                         │
+    User prompt             API key auth              Graph data
+    with context            via env var               via REST
+```
+
+### Installation
+
+The MCP server is distributed as an npm package:
+
+```bash
+npx -y @headvroom/mcp
+```
+
+No global installation required—`npx` handles versioning automatically.
+
+### Configuration
+
+**Environment Variables:**
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `HEADVROOM_API_KEY` | Yes | API key from Headvroom Settings |
+| `HEADVROOM_API_URL` | No | Override API endpoint (default: `https://headvroom.com/api`) |
+
+**Transport:** stdio (standard input/output)
+
+### API Key Management
+
+Generate keys at `https://headvroom.com` → Settings → API Keys.
+
+Key properties:
+
+- **Scoped to user** - Access only authenticated user's data
+- **Revocable** - Delete anytime from Settings
+- **Auditable** - Last-used timestamp tracked
+
+### Available Resources
+
+The MCP server exposes these resource URIs:
+
+| Resource | URI Pattern | Returns |
+|----------|-------------|---------|
+| Health | `headvroom://health` | Connection status |
+| All Graphs | `headvroom://graphs` | Graph list with metadata |
+| Graph by ID | `headvroom://graph/{id}` | Full graph (nodes, edges, notes) |
+| Graph Summary | `headvroom://graph/{id}/summary` | Lightweight overview |
+| Graph by Name | `headvroom://graph/name/{name}` | Lookup by display name |
+| Node Details | `headvroom://node/{id}` | Single node with content |
+| Search | `headvroom://nodes/search?query={q}` | Cross-graph search |
+| Recent Activity | `headvroom://activity/recent?days={n}` | Activity feed |
+| Graph Activity | `headvroom://graph/{id}/activity` | Per-graph activity |
+| GitHub Data | `headvroom://node/{id}/github` | Linked repo data |
+| All GitHub | `headvroom://integrations/github` | All GitHub connections |
+
+See [Resources Reference](/integrations/mcp/resources) for detailed schemas.
+
+### Rate Limits & Constraints
+
+| Constraint | Value |
+|------------|-------|
+| Nodes per graph query | 50 max |
+| Note content in lists | 500 chars (truncated) |
+| GitHub data cache | 5 minutes |
+| API rate limit | Standard Headvroom limits |
+
+### Error Handling
+
+The MCP server returns standard JSON-RPC errors:
+
+```json
+{
+  "error": {
+    "code": -32600,
+    "message": "Unauthorized - invalid or expired API key"
+  }
+}
+```
+
+Common error codes:
+
+- `-32600` - Invalid request / unauthorized
+- `-32601` - Unknown resource URI
+- `-32602` - Invalid parameters
+- `-32603` - Internal server error
+
+### Security Considerations
+
+- API keys grant **full read access** to user's graphs
+- All connections use **HTTPS** exclusively
+- Keys should be stored in environment variables, never committed to code
+- Recommend **separate keys per tool** for granular revocation
+- Periodic key rotation recommended for sensitive data
+
+</TabItem>
+<TabItem value="agents" label="Agents">
+
+## Quick Deploy Checklist
+
+Deploy Headvroom MCP integration for a user in under 5 minutes.
+
+### Prerequisites
+
+- User has Headvroom account at `headvroom.com`
+- User has created at least one graph
+- Target AI tool installed (Claude Desktop, Cursor, etc.)
+
+### Steps
+
+**1. Generate API Key** (30 seconds)
+
+```
+headvroom.com → Avatar → Settings → API Keys → + Generate New Key
+```
+
+Copy immediately. Won't be shown again.
+
+**2. Add MCP Config** (60 seconds)
+
+Claude Desktop (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "headvroom": {
+      "command": "npx",
+      "args": ["-y", "@headvroom/mcp"],
+      "env": {
+        "HEADVROOM_API_KEY": "hv_xxxxx"
+      }
+    }
+  }
+}
+```
+
+**3. Restart AI Tool** (10 seconds)
+
+Fully quit and reopen the application.
+
+**4. Verify** (30 seconds)
+
+```
+Prompt: "What graphs do I have in Headvroom?"
+Expected: List of user's graph names
+```
+
+### File Locations
+
+| Tool | Config Path |
+|------|-------------|
+| Claude Desktop (macOS) | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Claude Desktop (Windows) | `%APPDATA%\Claude\claude_desktop_config.json` |
+| Claude CLI | Run: `claude mcp add headvroom ...` |
+| Cursor | `~/.cursor/mcp.json` |
+| Windsurf | `~/.codeium/windsurf/mcp_config.json` |
+
+### Codebase Reference
+
+**MCP Server Implementation:**
+
+- Package: `@headvroom/mcp` (npm)
+- Source: `packages/mcp-server/` in headvroom repo
+- Entry: `src/index.ts`
+
+**API Routes (backend):**
+
+- Location: `app/api/mcp/` in main app
+- Auth: `lib/auth/api-keys.ts`
+- Data: Standard Supabase queries via `lib/supabase/`
+
+**Key Files:**
+
+```
+packages/mcp-server/
+├── src/
+│   ├── index.ts          # Entry point, stdio transport
+│   ├── server.ts         # MCP server setup
+│   ├── resources/        # Resource handlers
+│   │   ├── graphs.ts
+│   │   ├── nodes.ts
+│   │   ├── activity.ts
+│   │   └── github.ts
+│   └── utils/
+│       ├── api.ts        # Headvroom API client
+│       └── auth.ts       # API key validation
+├── package.json
+└── tsconfig.json
+```
+
+### Extension Points
+
+**Adding a new MCP resource:**
+
+1. Create handler in `src/resources/`:
+
+```typescript
+// src/resources/my-resource.ts
+export async function getMyResource(params: MyParams): Promise<MyData> {
+  const response = await api.get('/my-endpoint', params);
+  return response.data;
+}
+```
+
+2. Register in `src/server.ts`:
+
+```typescript
+server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+  const uri = request.params.uri;
+  if (uri.startsWith('headvroom://my-resource')) {
+    return { contents: [await getMyResource(parseParams(uri))] };
+  }
+  // ... existing handlers
+});
+```
+
+3. Add to resource list in `listResources` handler.
+
+**Data Flow:**
+
+```
+MCP Client Request
+    ↓
+stdio transport (index.ts)
+    ↓
+MCP Server (server.ts)
+    ↓
+Resource Handler (resources/*.ts)
+    ↓
+Headvroom API Client (utils/api.ts)
+    ↓
+Headvroom REST API (/api/mcp/*)
+    ↓
+Supabase (with RLS)
+```
+
+### Troubleshooting Commands
+
+```bash
+# Test MCP server directly
+HEADVROOM_API_KEY=hv_xxx npx -y @headvroom/mcp
+
+# Verify Claude CLI config
+claude mcp list
+
+# Check for config syntax errors (macOS)
+cat ~/Library/Application\ Support/Claude/claude_desktop_config.json | jq .
+
+# View Claude Desktop logs (macOS)
+tail -f ~/Library/Logs/Claude/mcp*.log
+```
+
+### Common Issues
+
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| "Connection refused" | MCP server not starting | Check npx is available, restart app |
+| "Unauthorized" | Bad API key | Regenerate at headvroom.com |
+| "No graphs found" | Empty account | Create a graph first |
+| Empty responses | Node limit hit | Query specific graphs, not all |
+
+</TabItem>
+</Tabs>
