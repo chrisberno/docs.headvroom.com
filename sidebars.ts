@@ -52,6 +52,11 @@ const sidebars: SidebarsConfig = {
           id: 'integrations/google-drive/index',
           label: 'Google Drive',
         },
+        {
+          type: 'doc',
+          id: 'integrations/notion/index',
+          label: 'Notion',
+        },
       ],
     },
     {
