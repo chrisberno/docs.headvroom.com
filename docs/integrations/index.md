@@ -26,6 +26,14 @@ Link Google Drive folders to your nodes and access your documents directly withi
 
 ---
 
+### [Notion](/integrations/notion)
+
+Embed published Notion pages directly in your nodes. View and edit Notion content without leaving Headvroom - changes sync in real-time.
+
+**Best for:** Documentation, wikis, product specs, collaborative content
+
+---
+
 ### GitHub *(Coming Soon)*
 
 Connect repositories to your project nodes and view commits, issues, and repository data without leaving Headvroom. Keep your development context alongside your knowledge structure.
@@ -36,7 +44,6 @@ Connect repositories to your project nodes and view commits, issues, and reposit
 
 ## Coming Soon
 
-- **Notion** - Sync pages and databases
 - **Linear** - Project and issue tracking
 - **Slack** - Team communication context
 - **Obsidian** - Note synchronization
