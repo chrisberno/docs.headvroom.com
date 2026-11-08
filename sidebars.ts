@@ -18,6 +18,7 @@ const sidebars: SidebarsConfig = {
       collapsed: false,
       items: [
         'features/nodes-connections',
+        'features/navigation',
         'features/notes',
         'features/links',
         'features/media',

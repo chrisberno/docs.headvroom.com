@@ -58,8 +58,11 @@ You now have a mini graph. Click either node to focus it and see its connections
 | **Focus a node** | Click it |
 | **Pan the canvas** | Click and drag on empty space |
 | **Zoom** | Scroll wheel or pinch |
-| **See your path** | Breadcrumb trail at the top |
-| **Go back** | Click any breadcrumb |
+| **See where you have been** | The trail along the bottom edge |
+| **Go back** | Click a chip in the trail, or **←** / **Alt+←** |
+| **Find a node** | Press `/` and type in the Search/Create box |
+
+More in [Navigation](./features/navigation.md).
 
 The **minimap** (bottom-right) shows your current viewport within the full graph.
 

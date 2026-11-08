@@ -69,8 +69,8 @@ Click any node to **focus** it:
 ### Exploration
 
 - **Expand**: Click unfocused nodes to explore their neighborhoods
-- **Breadcrumbs**: Track your path at the top of the screen
-- **History**: Click any breadcrumb to jump back
+- **Trail**: The nodes you visited run along the bottom edge; click one to jump back
+- **Back / Forward**: The arrows at the top left, or Alt+← / Alt+→ (see [Navigation](./navigation.md))
 
 ### Canvas Controls
 
@@ -93,4 +93,4 @@ Click any node to **focus** it:
 | **Create edge** | Connect button → drag handle to handle |
 | **Delete edge** | Click edge → Delete |
 | **Focus node** | Single click |
-| **Navigate back** | Breadcrumb trail |
+| **Navigate back** | Trail chip, ← or Alt+← |
