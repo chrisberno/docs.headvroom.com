@@ -27,13 +27,10 @@ Nodes are the fundamental units of your graph. Each node represents an idea, top
 
 ### Deleting Nodes
 
-1. Click the node to select it
-2. Click **Delete** or press the Delete key
-3. Confirm deletion
+1. Right-click the node
+2. Choose **Delete Node**. There is no confirm.
 
-:::warning
-Deleting a node also removes all its connected edges.
-:::
+Deleting a node also removes its links to other nodes. For 10 seconds a bar at the bottom of the graph offers **Undo**, which brings the node back with its links. After that, restore it from [History](./history).
 
 ---
 
@@ -51,9 +48,10 @@ Edges are the lines connecting nodes. They represent relationships between conce
 
 ### Deleting Edges
 
-1. Click an edge to select it (highlights)
-2. Click **Delete** or press Delete key
-3. Confirm deletion
+1. Right-click the edge
+2. Choose **Delete Connection**. There is no confirm.
+
+To bring it back, use **Restore link** in [History](./history).
 
 ---
 

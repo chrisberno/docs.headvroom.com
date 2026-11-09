@@ -200,6 +200,7 @@ Headvroom is a modern knowledge graph visualization tool that helps you:
 - **Organize visually** - Create nodes for ideas, topics, and resources
 - **Connect everything** - Draw relationships between nodes
 - **Explore naturally** - Click any node to see its connections
+- **Sort at a glance** - [Types and tags](/features/types-tags): a colour and icon per kind of node, tags across graphs
 - **Attach rich content** - Notes, links, files, media, Google Drive folders
 - **Share publicly** - Embed individual nodes on external sites
 

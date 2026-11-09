@@ -19,7 +19,12 @@ const sidebars: SidebarsConfig = {
       items: [
         'features/nodes-connections',
         'features/navigation',
+        'features/library',
+        'features/move-to-graph',
         'features/views',
+        'features/types-tags',
+        'features/history',
+        'features/pins',
         'features/notes',
         'features/links',
         'features/media',
