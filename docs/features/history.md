@@ -58,7 +58,7 @@ A link to a node that is **also deleted** cannot come back yet; the message name
 
 A link removed on its own shows as *Removed link …* in History (This node or This graph), with **Restore link**. It comes back with the same ends, type and settings.
 
-- It is refused while the link is already there, or while a node at either end is deleted.
+- It is refused while the link is already there, while a node at either end is deleted, or when **Move to graph** has left its two ends in different graphs. The message says which.
 - Links removed together with a deleted node come back when you restore that node, so they have no button of their own.
 
 ## What History cannot do yet
