@@ -24,6 +24,8 @@ Four visual themes available via the **palette icon** in the header.
 - Preference syncs across devices via Supabase
 - Respects `prefers-reduced-motion` accessibility setting
 
+A **Dot grid** behind the canvas can be switched on in Settings → Appearance; see [Views → Dot grid](./views.md#dot-grid).
+
 ---
 
 ## Layout Algorithms
