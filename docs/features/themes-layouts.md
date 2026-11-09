@@ -5,60 +5,38 @@ sidebar_position: 6
 
 # Themes & Layouts
 
-Customize the visual appearance of your graph.
+Choose how HeadVroom looks, and see how the Map lays out your graph.
 
 ## Themes
 
-Four visual themes available via the **palette icon** in the header.
+Open **Settings** (your avatar, top right) → **Appearance**, and pick a theme from the dropdown (the palette icon, showing the current theme's name). Typing `theme` in the Settings search box finds it.
 
 | Theme | Description |
 |-------|-------------|
 | **Dark** (default) | Charcoal background, cyan accents. Low-light friendly. |
-| **Light** | White background, blue accents. Daytime use. |
-| **Outer Space** | Deep space with animated starfield, purple nebula effects. |
-| **Custom** | Placeholder for future user-defined themes. |
+| **Light** | Light background, blue accents. Daytime use. |
+| **Outer Space** | Deep blue-black background, violet accents. |
+| **Custom** | A placeholder for themes of your own, for now the same colours as Dark. |
 
-### Theme Features
+- A new theme **applies at once**, on the page you are on and the graph behind the Settings panel, with no Save button. The Settings panel follows it too.
+- It is **saved to your account**, so it follows you to any browser.
+- The colours fade over a moment when you switch; with your system's **reduce motion** setting on, they switch instantly.
+- **Embeds** of your nodes on other sites always show in Dark.
 
-- Instant switching with smooth transitions
-- Preference syncs across devices via Supabase
-- Respects `prefers-reduced-motion` accessibility setting
-
----
-
-## Layout Algorithms
-
-Four ways to arrange your graph. Switch via the **layout dropdown** in the toolbar.
-
-### Center Focus (Radial)
-
-Focused node at center, connections arranged in a circle.
-
-**Best for:** Exploring a node's immediate neighborhood.
-
-### Hierarchical
-
-Top-to-bottom tree structure using dagre algorithm.
-
-**Best for:** Org charts, dependency trees, workflows.
-
-### Force-Directed
-
-Physics simulation balancing attraction and repulsion.
-
-**Best for:** Discovering natural clusters in your graph.
-
-### Organic
-
-Softer force-directed with radial clustering.
-
-**Best for:** Large graphs with natural, spread-out appearance.
+The **Dot grid** switch sits in the same Appearance section; see [Views → Dot grid](./views.md#dot-grid).
 
 ---
 
-## Persistence
+## Layout
 
-Both theme and layout preferences:
-- Save automatically when changed
-- Persist across sessions
-- Sync across devices (same account)
+There is no layout chooser: the **Map** always lays your graph out around the node you are on (the *active* node), the way TheBrain does.
+
+- The **active node** sits in the middle.
+- Its **parents** sit in a row above it, its **children** in rows below it.
+- Its **lateral links** (jumps) sit in a column on the left, and its **siblings** (the other children of its parents) in a column on the right.
+- Only these relatives are shown; every other node waits until you move closer to it.
+- **Click a node** to make it the active node: the Map glides to the new layout around it.
+
+The same graph and the same active node always give the same layout, so a place you come back to looks the way you left it.
+
+To see the **whole graph** at once, switch to **Tree**; to scan a node's children, switch to **Cards**. See [Views](./views.md).
