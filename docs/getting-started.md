@@ -74,16 +74,16 @@ The **minimap** (bottom-right) shows your current viewport within the full graph
 Double-click any node's title to edit it inline. Press Enter to save, Escape to cancel.
 
 ### Delete a Node
-1. Click the node to select it
-2. Click the **Delete** button in the toolbar or press the Delete key
-3. Confirm in the dialog
+1. Right-click the node
+2. Choose **Delete Node** (there is no confirm)
 
-Connected edges are automatically removed.
+Its links to other nodes are removed with it. For 10 seconds, **Undo** at the bottom of the graph brings it all back; after that, use [History](./features/history).
 
 ### Delete an Edge
-1. Click an edge to select it (it highlights)
-2. Click **Delete** or press the Delete key
-3. Confirm
+1. Right-click the edge
+2. Choose **Delete Connection** (there is no confirm)
+
+To bring it back, use **Restore link** in [History](./features/history).
 
 ---
 
