@@ -24,7 +24,7 @@ Sessions persist automatically. Close the browser, come back later - you'll stil
 
 ## Your First Graph
 
-When you first log in, you'll see your **graph list** - a picker showing all your graphs. Create a new graph or select an existing one to open it.
+When you log in, you land on the **[Library](features/library)**: every graph you own as a card. Click **New graph** to start one, or click a card to open it.
 
 ### Create Your First Node
 
