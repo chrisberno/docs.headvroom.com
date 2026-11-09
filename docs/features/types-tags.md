@@ -61,7 +61,7 @@ On the **Notes** tab, click **Markdown** at the top right.
 
 - Type up to **40 characters** and press `Enter`. `Esc` cancels. Clear the field and press `Enter` to remove the name.
 - Names **always show** on the map, beside their link and **clear of nodes and of other names**. They appear a moment after the map settles.
-- A name with no free spot shows while you **hover over or select** its link.
+- A name with no free spot shows while you **hover over or select** its link, or **hover its node's row** in the Info Panel's Connected Nodes list. Choosing that row keeps the name shown on the node it opens, so every name can be read even on a crowded map.
 
 ### Through MCP
 
