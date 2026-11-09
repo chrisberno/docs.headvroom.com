@@ -19,6 +19,9 @@ const sidebars: SidebarsConfig = {
       items: [
         'features/nodes-connections',
         'features/navigation',
+        'features/library',
+        'features/move-to-graph',
+        'features/views',
         'features/types-tags',
         'features/notes',
         'features/links',
