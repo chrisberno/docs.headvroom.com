@@ -22,6 +22,7 @@ const sidebars: SidebarsConfig = {
         'features/library',
         'features/move-to-graph',
         'features/views',
+        'features/types-tags',
         'features/notes',
         'features/links',
         'features/media',

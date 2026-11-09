@@ -55,9 +55,19 @@ Once connected, try asking your AI:
 - *"What have I been working on this week?"*
 - *"Search my graphs for anything about authentication."*
 
-### What It Can't Do (Yet)
+### What It Can Change
 
-Currently, the MCP server is **read-only**. Your AI can view your data but cannot create or modify nodes. Write access is coming soon.
+Your AI can also write, through `POST /api/mcp/write` with the same API key:
+
+- **Nodes:** `create_node`, `update_node` (also sets tags and a type in `metadata`), `delete_node`
+- **Links:** `create_edge` (optional `label` names the link), `update_edge` (set or clear a link's name), `delete_edge`
+- **Graphs:** `create_graph`
+
+Every change is recorded in history with the key that made it. See [Types & Tags](/features/types-tags#through-mcp) for link names.
+
+### What It Can't Do
+
+Link GitHub repos, upload files, or sign in: those need the browser.
 
 </TabItem>
 <TabItem value="developers" label="Developers">
